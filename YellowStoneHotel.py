@@ -2,9 +2,6 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 import time
 
-import smtplib
-from email.mime.text import MIMEText
-
 def search_room(driver, start_date, end_date, hotel_name):
     location = driver.find_element_by_id("header-sn-location")
     arrival = driver.find_element_by_id("header-sn-arrival")
@@ -39,7 +36,6 @@ def search_room(driver, start_date, end_date, hotel_name):
         driver.close()
         return False
 
-
 def main():
     hotels = ['Canyon Lodge',
               'Grant Village',
@@ -61,7 +57,7 @@ def main():
     
     for hotel in hotels:
         for i in range(len(dates)-1):
-            summary_str = summary_str + hotel + '\t\t' + dates[i] + '\t\t'
+            summary_str = summary_str + hotel + '\t\t\t' + dates[i] + '\t\t\t'
             
             if search_room(driver, dates[i], dates[i+1], hotel):
                 summary_str = summary_str + 'Yes\n'
@@ -69,7 +65,7 @@ def main():
                 summary_str = summary_str + 'No\n'
 
             driver.switch_to_window(window_before)
-            
+
     driver.quit()
     print(summary_str)
 
