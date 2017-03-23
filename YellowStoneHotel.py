@@ -1,6 +1,7 @@
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 import time
+import WindowsPopup
 
 def search_room(driver, start_date, end_date, hotel_name):
     location = driver.find_element_by_id("header-sn-location")
@@ -36,7 +37,7 @@ def search_room(driver, start_date, end_date, hotel_name):
         driver.close()
         return False
 
-def main():
+def main():    
     hotels = ['Canyon Lodge',
               'Grant Village',
               'Lake Lodge',
@@ -48,26 +49,33 @@ def main():
     dates = ['2017-07-01', '2017-07-02', '2017-07-03', '2017-07-04']
     summary_str = 'Hotel\t\t\t\tDate\t\t\tAvailability\n'
 
-    driver = webdriver.Chrome()
+    #driver = webdriver.Chrome()
+    driver = webdriver.PhantomJS()
     driver.get("http://www.yellowstonenationalparklodges.com/")
     bookTrip = driver.find_element_by_id("book")
     bookTrip.click()
     time.sleep(2)
     window_before = driver.window_handles[0]
-    
-    for hotel in hotels:
-        for i in range(len(dates)-1):
-            summary_str = summary_str + hotel + '\t\t\t' + dates[i] + '\t\t\t'
-            
-            if search_room(driver, dates[i], dates[i+1], hotel):
-                summary_str = summary_str + 'Yes\n'
-            else:
-                summary_str = summary_str + 'No\n'
+    while True:
+        roomAvailable = False;
+        for hotel in hotels:
+            for i in range(len(dates)-1):
+                summary_str = summary_str + hotel + '\t\t\t' + dates[i] + '\t\t\t'
+                hasRoom = search_room(driver, dates[i], dates[i+1], hotel)
+                roomAvailable |= hasRoom
+                if hasRoom:
+                    summary_str = summary_str + 'Yes\n'
+                else:
+                    summary_str = summary_str + 'No\n'
 
-            driver.switch_to_window(window_before)
+                driver.switch_to_window(window_before)
+        if (roomAvailable):
+            print(summary_str)
+            WindowsPopup.balloon_tip("Congratulations!", "Room Available!")
+        time.sleep(100)
 
     driver.quit()
-    print(summary_str)
+
 
 if __name__ == '__main__':
     main()
